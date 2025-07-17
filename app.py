@@ -18,15 +18,7 @@ from urllib.parse import parse_qs
 query_params = st.query_params
 token = query_params.get("token", None)
 
-# Compare with valid token stored by Flask
-def get_valid_token():
-    try:
-        with open("session_token.txt", "r") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return None
-
-if token != get_valid_token():
+if token is None:
     st.error("🔒 Unauthorized. Please login through the main website.")
     st.stop()
 
