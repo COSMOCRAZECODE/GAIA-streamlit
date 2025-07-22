@@ -67,6 +67,37 @@ if page == "Home":
         - Get actionable, goal-oriented advice from our AI Agent, Gaia.
     """)
 
+    #Chat bot
+    st.subheader("💬 Talk to Climate Mate")
+    st.write("Have a conversation about sustainable living, climate science, or green habits.")
+
+    user_input = st.text_input("You:", placeholder="Ask something like 'How can I reduce plastic usage?'")
+
+    # Initialize UI display history
+    if "chat_display_history" not in st.session_state:
+        st.session_state.chat_display_history = []
+
+    # Initialize Gemini API-compatible history
+    if "chat_model_history" not in st.session_state:
+        st.session_state.chat_model_history = []
+
+    # Process message
+    if st.button("Send") and user_input.strip():
+        reply_text, updated_model_history = chat_with_mate(
+            st.session_state.chat_model_history, user_input
+        )
+
+        # Update session state
+        st.session_state.chat_model_history = updated_model_history
+        st.session_state.chat_display_history.append((user_input, reply_text))
+        st.experimental_rerun()  # rerun to clear input box
+
+    # Display the last 5 exchanges
+    for user, reply in reversed(st.session_state.chat_display_history[-5:]):
+        st.markdown(f"**You:** {user}")
+        st.markdown(f"**Mate:** {reply}")
+
+
     # ✅ Use session state if available, else default data
     if "carbon_breakdown" in st.session_state:
         carbon_data = st.session_state.carbon_breakdown
@@ -232,9 +263,6 @@ elif page == "Climate Mate":
     with col2:
         if st.button("❓ Climate Quiz"):
             st.session_state.cm_mode = "quiz"
-    with col3:
-        if st.button("💬 Talk to Climate Mate"):
-            st.session_state.cm_mode = "chat"
 
     st.markdown("---")
 
@@ -270,32 +298,6 @@ elif page == "Climate Mate":
                     st.success(f"✅ Correct Answer: {correct_option}")
 
                 st.markdown("---")
-
-    # --- 3. CHAT MODE ---
-    elif st.session_state.get("cm_mode") == "chat":
-        st.subheader("💬 Talk to Climate Mate")
-        st.write("Have a conversation about sustainable living, climate science, or green habits.")
-
-        user_input = st.text_input("You:", placeholder="Ask something like 'How can I reduce plastic usage?'")
-
-        # UI history for display
-        if "chat_display_history" not in st.session_state:
-            st.session_state.chat_display_history = []
-
-        # Gemini-compatible history
-        if "chat_model_history" not in st.session_state:
-            st.session_state.chat_model_history = []
-
-        if st.button("Send") and user_input:
-            model_history = st.session_state.chat_model_history
-            reply_text, updated_model_history = chat_with_mate(model_history, user_input)
-
-            st.session_state.chat_model_history = updated_model_history
-            st.session_state.chat_display_history.append((user_input, reply_text))
-
-        for user, reply in reversed(st.session_state.chat_display_history[-5:]):
-            st.markdown(f"**You:** {user}")
-            st.markdown(f"**Mate:** {reply}")
 
 # st.sidebar.markdown("## 🔒 Logout")
 elif page == "Logout":
