@@ -309,5 +309,12 @@ elif page == "Climate Mate":
 
 # st.sidebar.markdown("## 🔒 Logout")
 elif page == "Logout":
-    webbrowser.open_new("https://gaia-flask.onrender.com/logout")
+    st.markdown(
+        """
+        <script>
+            window.open("https://gaia-flask.onrender.com/logout", "_blank");
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
     st.stop()
