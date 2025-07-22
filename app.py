@@ -90,7 +90,7 @@ if page == "Home":
         # Update session state
         st.session_state.chat_model_history = updated_model_history
         st.session_state.chat_display_history.append((user_input, reply_text))
-        st.experimental_rerun()  # rerun to clear input box
+        st.rerun()  # rerun to clear input box
 
     # Display the last 5 exchanges
     for user, reply in reversed(st.session_state.chat_display_history[-5:]):
@@ -301,5 +301,5 @@ elif page == "Climate Mate":
 
 # st.sidebar.markdown("## 🔒 Logout")
 elif page == "Logout":
-    webbrowser.open_new("http://gaia-flask.onrender.com/logout")
+    webbrowser.open_new("https://gaia-flask.onrender.com/logout")
     st.stop()
