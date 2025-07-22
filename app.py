@@ -67,7 +67,14 @@ if page == "Home":
         - Get actionable, goal-oriented advice from our AI Agent, Gaia.
     """)
 
-    #Chat bot
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY")
+    genai.configure(api_key=api_key)
+
+    # Instantiate the model once (reuse across functions)
+    model = genai.GenerativeModel(model_name="models/gemini-1.5-flash")
+
+    # Chatbot UI
     st.subheader("💬 Talk to Climate Mate")
     st.write("Have a conversation about sustainable living, climate science, or green habits.")
 
@@ -77,20 +84,21 @@ if page == "Home":
     if "chat_display_history" not in st.session_state:
         st.session_state.chat_display_history = []
 
-    # Initialize Gemini API-compatible history
-    if "chat_model_history" not in st.session_state:
-        st.session_state.chat_model_history = []
+    # Initialize persistent Gemini chat session
+    if "climate_mate_chat" not in st.session_state:
+        st.session_state.climate_mate_chat = model.start_chat(history=[])
 
     # Process message
     if st.button("Send") and user_input.strip():
-        reply_text, updated_model_history = chat_with_mate(
-            st.session_state.chat_model_history, user_input
-        )
+        try:
+            convo = st.session_state.climate_mate_chat
+            response = convo.send_message(user_input)
 
-        # Update session state
-        st.session_state.chat_model_history = updated_model_history
-        st.session_state.chat_display_history.append((user_input, reply_text))
-        st.rerun()  # rerun to clear input box
+            # Update UI chat history
+            st.session_state.chat_display_history.append((user_input, response.text.strip()))
+            st.rerun()
+        except Exception as e:
+            st.error("Something went wrong in the conversation.")
 
     # Display the last 5 exchanges
     for user, reply in reversed(st.session_state.chat_display_history[-5:]):
